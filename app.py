@@ -13,7 +13,8 @@ import os
 
 from calenderCalc.iCal import PregnancyICal
 
-app = Flask(__name__)
+app = Flask('PregnancyCalendar')
+app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'THIS IS NOT A SECRET')
 
 # Function to create a file
 def create_file(selected_option: str, date_input: str, week_input: int , show_week_starts: bool, add_trimester_starts: bool):
