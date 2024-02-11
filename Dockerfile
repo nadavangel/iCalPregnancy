@@ -9,7 +9,7 @@ RUN pip install poetry \
     && poetry install --no-interaction --no-ansi
 
 ARG FLASK_SECRET_KEY
-ENV FLASK_SECRET_KEY FLASK_SECRET_KEY
+ENV FLASK_SECRET_KEY $FLASK_SECRET_KEY
 
 COPY . /app
 
