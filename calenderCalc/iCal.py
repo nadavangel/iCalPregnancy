@@ -39,8 +39,10 @@ class iCal():
 		self.cal.add_component(event)
 		
 	def writeFile(self, directory: Path, fileName: str):
-		with open(os.path.join(directory, fileName + '.ics'), 'wb') as f:
+		fullPath = os.path.join(directory, fileName + '.ics')
+		with open(fullPath, 'wb') as f:
 			f.write(self.cal.to_ical())
+		return fullPath
 
 
 class PregnancyICal():
@@ -107,9 +109,9 @@ class PregnancyICal():
 	def addTrimester(self, value: bool) -> None:
 		self._addTrimester = value
 	
-	def write(self, directory: Path):
+	def write(self, directory: Path, fileName: str = 'PregnancyCalendar'):
 		self.addEvents()
-		self._cal.writeFile(directory=directory, fileName='PregnancyCalendar')
+		return self._cal.writeFile(directory=directory, fileName=fileName)
 	
 	def addEvents(self):
 		if self.lmp is None:
