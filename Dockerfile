@@ -4,12 +4,9 @@ WORKDIR /app
 
 COPY poetry.lock pyproject.toml /app/
 
-RUN pip install poetry \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
-
-ARG FLASK_SECRET_KEY
-ENV FLASK_SECRET_KEY $FLASK_SECRET_KEY
+RUN pip install poetry
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-interaction --no-ansi
 
 COPY . /app
 

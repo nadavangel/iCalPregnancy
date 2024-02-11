@@ -7,6 +7,7 @@ from pathlib import Path
 
 from flask import Flask, render_template, request, send_file, abort, Response
 from json import dumps
+from dotenv import load_dotenv
 
 import time
 import os
@@ -14,6 +15,7 @@ import os
 from calenderCalc.iCal import PregnancyICal
 
 app = Flask('PregnancyCalendar')
+load_dotenv()
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'THIS IS NOT A SECRET')
 
 # Function to create a file
@@ -71,4 +73,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000)
