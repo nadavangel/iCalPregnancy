@@ -46,22 +46,35 @@ class iCal():
 class PregnancyICal():
 	_cal: iCal
 	_lmp: datetime | None
+	_ovulationDate: datetime | None
 	_allDays: bool
 	_addTrimester: bool
+	_skipWeeks: int
+	NUM_DAYS_IN_WEEK: int = 7
+	
+	TRIMESTER_WEEKS_NUMBERS = [14, 28]
 	
 	def __init__(self, lastMonthlyPeriod: datetime | None = None):
 		self._cal = iCal()
-		self._lmp = lastMonthlyPeriod
+		self._lmp = None
+		self._ovulationDate = None
 		self._allDays = True
 		self._addTrimester = True
+		self._skipWeeks = 2
+		if lastMonthlyPeriod is not None:
+			self.lmp = lastMonthlyPeriod
 	
 	@property
 	def lmp(self) -> datetime:
 		return self._lmp
 	
 	@lmp.setter
-	def lmp(self, value: datetime) -> None:
+	def lmp(self, value: datetime | None) -> None:
 		self._lmp = value
+		if value is not None:
+			self._ovulationDate = self._lmp + timedelta(weeks=2)
+	
+	lastMonthlyPeriod = lmp
 	
 	@property
 	def allDays(self) -> bool:
@@ -70,6 +83,21 @@ class PregnancyICal():
 	@allDays.setter
 	def allDays(self, value: bool) -> None:
 		self._allDays = value
+		
+	@property
+	def ovulationDate(self) -> datetime | None:
+		return self._ovulationDate
+	
+	@ovulationDate.setter
+	def ovulationDate(self, value: datetime) -> None:
+		self.lmp = value - timedelta(weeks=2)
+		
+	def setByWeekNumber(self, weekNum: int) -> None:
+		presentday = datetime.today()
+		presentday = presentday.replace(hour=0, minute=0, second=0, microsecond=0)
+		self.lmp = presentday - timedelta(weeks=weekNum)
+		self._skipWeeks = weekNum # should we do this here?
+		
 	
 	@property
 	def addTrimester(self) -> bool:
@@ -95,18 +123,29 @@ class PregnancyICal():
 		if self.addTrimester:
 			self._addTrimseterEvents()
 			
-		self._cal.addEvent(self.lmp + timedelta(281), 'Expected date!!')
+		self._cal.addEvent(self.lmp + timedelta(280), 'Expected date!!')
 			
 	def _addAllDaysEvents(self):
-		for day in range(14, 280):
+		for day in range(self._skipWeeks * self.NUM_DAYS_IN_WEEK, 280):
 			this_day = self.lmp + timedelta(day)
-			week_num = int(day / 7)
-			day_of_week = day % 7
+			week_num = int(day / self.NUM_DAYS_IN_WEEK)
+			day_of_week = day % self.NUM_DAYS_IN_WEEK
 			self._cal.addEvent(date=this_day, name = f'week {week_num} day {day_of_week}')
 	
 	def _addFirstDayOfWeekEvents(self):
-		pass
+		for day in range(self._skipWeeks * self.NUM_DAYS_IN_WEEK, 280, 7):
+			this_day = self.lmp + timedelta(day)
+			week_num = int(day / self.NUM_DAYS_IN_WEEK)
+			self._cal.addEvent(date=this_day, name=f'week {week_num}')
 	
 	def _addTrimseterEvents(self):
-		pass
+		nth = {
+			1: "First",
+			2: "Second",
+			3: "Third"
+		}
+		
+		for i, trimesterWeekNum in enumerate(self.TRIMESTER_WEEKS_NUMBERS):
+			this_day = self.lmp + timedelta(weeks=trimesterWeekNum)
+			self._cal.addEvent(date=this_day, name=f'{nth[i+2]} Trimseter!')
 	
