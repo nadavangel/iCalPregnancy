@@ -3,6 +3,7 @@ import tempfile
 import threading
 import uuid
 from datetime import datetime
+from pathlib import Path
 
 from flask import Flask, render_template, request, send_file, abort, Response
 from json import dumps
@@ -33,7 +34,7 @@ def create_file(selected_option: str, date_input: str, week_input: int , show_we
         
     cal.addTrimester = add_trimester_starts
     cal.allDays = not show_week_starts
-    fullPath = cal.write(directory=tempfile.gettempdir(), fileName = filename)
+    fullPath = cal.write(directory=Path(tempfile.gettempdir()), fileName = filename)
     return fullPath
 
 # Function to delete a file after 2 minutes
@@ -54,6 +55,11 @@ def index():
         week_input = request.form.get('week_input')
         show_week_starts = 'show_week_starts' in request.form
         add_trimester_starts = 'add_trimester_starts' in request.form
+        
+        if week_input == '':
+            week_input  = 2
+        else:
+            week_input = int(week_input)
 
         filename = create_file(selected_option, date_input, week_input, show_week_starts, add_trimester_starts)
 
